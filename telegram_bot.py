@@ -1,8 +1,4 @@
-""" The main interface of the Telegram Bot, where all methods are defined
-TODO: 
-    try-catch everything 
-    comment every function
-    beautiful code"""
+""" The main interface of the Telegram Bot, where all methods are defined """
 
 import json
 import requests
@@ -11,10 +7,15 @@ from telegram_utility import (GetParameter, DeJson, MyError, PrintDict, GetForma
 from telegram_types import (TelegramObject,User, GroupChat, Message, PhotoSize, Audio, Document, Sticker, Video, Voice, Contact, Location, Update, UserProfilePhotos, ReplyKeyboardHide, ReplyKeyboardMarkup, ForceReply )
 from requests_toolbelt import MultipartEncoder
 
+# Standard timeout for polling updates.
+
 TIMEOUT = 2
 
 
 class Bot(object):
+    
+    # Bot is initialized.
+    # @token -> bot's token to access API.
     
     def __init__(self, token):
         try:
@@ -29,12 +30,13 @@ class Bot(object):
     # Starts receiving updates (via short/long polling) until manually interrupted, to be called only once.
     # Last update offset is saved in the 'offset.txt' file.
     # @HandleMessage -> function to call when handling a message. It must return the last update offset. His args are [last update offset, Update].
+    # @time -> the time of polling. If None, TIMEOUT will be used.
     
-    def StartPolling(self, HandleMessage):       
+    def StartPolling(self, HandleMessage, time=TIMEOUT):       
         last_update = ReadOffset("offset.txt")
         while True:
             
-            upd_arr = self.getUpdate({"offset":last_update, "timeout":TIMEOUT})
+            upd_arr = self.getUpdate({"offset":last_update, "timeout":time})
             f = False
             
             for i in upd_arr:
@@ -49,6 +51,7 @@ class Bot(object):
             WriteOffset("offset.txt", last_update)
     
     # Gets a list of updates with id > offset.
+    # @getupd_dict -> dict with parameters to use (see Telegram API)
     
     def getUpdate(self, getupd_dict):
         try:
@@ -68,6 +71,7 @@ class Bot(object):
             raise MyError("Unable to getMe")
     
     # Sends a text Message object to User/GroupChat and, in case of success, returns the Message sent.
+    # @send_dict -> dict with parameters to use (see Telegram API)
     
     def sendMessage(self, send_dict):
         try:
@@ -78,6 +82,7 @@ class Bot(object):
             raise MyError("Unable to send the message")
     
     # Forwards a Message to User/GroupChat and, in case of success, returns the message forwarded.
+    # @forward_dict -> dict with parameters to use (see Telegram API)
     
     def forwardMessage(self, forward_dict):
         try:
@@ -88,6 +93,8 @@ class Bot(object):
             raise MyError("Unable to forward the message")
      
     #Sends a photo and, in case of success, returns the message sent.
+    # @param_dict -> dict with parameters to use (see Telegram API)
+    # @photo_path -> the path of the photo
     
     def sendPhoto(self, param_dict, photo_path):
         try:
@@ -100,7 +107,9 @@ class Bot(object):
             raise MyError("Unable to send photo")
        
     # Sends an .mp3 audio and, in case of success, returns the message sent.
-         
+    # @param_dict -> dict with parameters to use (see Telegram API)
+    # @audio_path -> the path of the audio  
+    
     def sendAudio(self, param_dict, audio_path):
         try:
             header = "audio/mpeg"
@@ -112,7 +121,9 @@ class Bot(object):
             raise MyError("Unable to send audio")
     
     # Sends a .ogg [ encoded with OPUS ] voice and, in case of success, returns the message sent.
-         
+    # @param_dict -> dict with parameters to use (see Telegram API)
+    # @voice_path -> the path of the voice
+    
     def sendVoice(self, param_dict, voice_path):
         try:
             header = "audio/ogg"
@@ -124,6 +135,8 @@ class Bot(object):
             raise MyError("Unable to send voice")
     
     # Sends a text/plain document and, in case of success, returns the message sent.
+    # @param_dict -> dict with parameters to use (see Telegram API)
+    # @document_path -> the path of the document
     
     def sendDocument(self, param_dict, document_path):
         try:
@@ -136,6 +149,8 @@ class Bot(object):
             raise MyError("Unable to send document")
     
     # Sends a .webp sticker and, in case of success, returns the message sent.
+    # @param_dict -> dict with parameters to use (see Telegram API)
+    # @sticker_path -> the path of the sticker
     
     def sendSticker(self, param_dict, sticker_path):
         try:
@@ -148,6 +163,8 @@ class Bot(object):
             raise MyError("Unable to send sticker")
     
     # Sends a .mp4 video and, in case of success, returns the message sent.
+    # @param_dict -> dict with parameters to use (see Telegram API)
+    # @video_path -> the path of the video
     
     def sendVideo(self, param_dict, video_path):
         try:
@@ -161,6 +178,7 @@ class Bot(object):
         
                     
     # Sends the location and, in case of success, returns the message sent.
+    # @location_dict -> dict with parameters to use (see Telegram API)
     
     def sendLocation(self, location_dict):
         try:
@@ -171,6 +189,7 @@ class Bot(object):
             raise MyError("Unable to send the location")
         
     # Sends the chat action (e.g. 'typing', 'sending a photo' etc).
+    # @chat_dict -> dict with the parameters to use (see Telegram API)
     
     def sendChatAction(self, chat_dict):
         try:
@@ -180,6 +199,10 @@ class Bot(object):
             raise MyError("Unable to send chat action")
         
     # Executes a request to a specified url and returns a dict.
+    # @url -> url to send the post request to
+    # @params -> dict with Json parameters to encode in url query string
+    # @data -> data to send with multipart-form data
+    # @headers -> optional headers.
     
     def Execute(self, url, params=None, data=None, headers=None):
         try:
