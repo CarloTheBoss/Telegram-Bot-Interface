@@ -6,6 +6,7 @@ TODO:
 
 import json
 import requests
+import os
 from telegram_utility import (GetParameter, DeJson, MyError, PrintDict, GetFormat, ReadOffset, WriteOffset)
 from telegram_types import (TelegramObject,User, GroupChat, Message, PhotoSize, Audio, Document, Sticker, Video, Voice, Contact, Location, Update, UserProfilePhotos, ReplyKeyboardHide, ReplyKeyboardMarkup, ForceReply )
 from requests_toolbelt import MultipartEncoder
@@ -26,18 +27,26 @@ class Bot(object):
             raise MyError("Unable to init the bot")
         
     # Starts receiving updates (via short/long polling) until manually interrupted, to be called only once.
+    # Last update offset is saved in the 'offset.txt' file.
+    # @HandleMessage -> function to call when handling a message. It must return the last update offset. His args are [last update offset, Update].
     
-    def StartPolling(self):
+    def StartPolling(self, HandleMessage):       
         last_update = ReadOffset("offset.txt")
         while True:
+            
             upd_arr = self.getUpdate({"offset":last_update, "timeout":TIMEOUT})
             f = False
-            for i in upd_arr:
-                # Handle updates
             
-            WriteOffset("offset.txt", last_update)
+            for i in upd_arr:
+                
+                if last_update <= i.update_update_id:
+                    f = True
+                    last_update = max(last_update, HandleMessage(last_update, i))
+                    
             if f:
                 last_update += 1
+            
+            WriteOffset("offset.txt", last_update)
     
     # Gets a list of updates with id > offset.
     
