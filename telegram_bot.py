@@ -42,6 +42,7 @@ class Bot(object):
             for i in upd_arr:
                 
                 if last_update <= i.update_update_id:
+                    WriteOffset("offset.txt", i.update_update_id+1)
                     f = True
                     last_update = max(last_update, HandleMessage(last_update, i))
                     
