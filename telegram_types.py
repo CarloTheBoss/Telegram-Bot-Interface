@@ -7,7 +7,7 @@
  Attribute names are the same of the official Telegram API """
  
 from telegram_utility import (GetParameter,ToJson)
-
+import os
 
 """ Every class has a dict of all of his attributes and a nameclass_json which contains a json serialized string of the class """
 
@@ -18,7 +18,11 @@ class TelegramObject(object):
     def Debug(self, tmp_dict, obj_name):
         print("\n\n"+obj_name+" debug:\n")
         for i in tmp_dict:
-            print(str(i) + " : " + str(tmp_dict[i]))
+            if i == "date":
+                print("Date: ")
+                cosa = os.system("date -d @%s" %tmp_dict[i])
+            else:
+                print(str(i) + " : " + str(tmp_dict[i]))
         print("\n\n")
 
 class User(TelegramObject):
