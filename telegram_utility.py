@@ -24,10 +24,11 @@ def GetParameter(tmp_dict, param_name, optional=False):
     if param_name in tmp_dict:
         return tmp_dict[ param_name ]
     else:
-        if optional:
-            return None
-        else:
-            raise MyError("Missing fundamental attribute")
+        return None
+        #if optional:
+        #    return None
+        #else:
+        #    raise MyError("Missing fundamental attribute")
 
 # Prints a dict in a clearer way (i.e. with endlines and without all those brackets etc):
 

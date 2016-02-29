@@ -105,5 +105,5 @@ class Message(TelegramObject):
 class Update(TelegramObject):
     def __init__(self, update_dict):
         self.update_update_id = GetParameter(update_dict, "update_id")
-        self.update_message = Message( GetParameter(update_dict, "message", True) )
+        self.update_message = Message( GetParameter(update_dict, "message", False) )
    
